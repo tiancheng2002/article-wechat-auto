@@ -15,57 +15,6 @@
 
 ---
 
-## 使用方式
-
-最简单的方式是直接调用主 skill：
-
-```text
-$article-wechat-auto 发布一篇最新的 AI 资讯
-```
-
-如果只想执行某一个环节，也可以单独调用子 skill：
-
-```text
-$article-search 搜索最新 AI 资讯
-$article-writing 把第一篇资讯整理成公众号 Markdown
-$article-cover-image 为这篇文章生成封面图
-$article-format 把 Markdown 转成微信可复制 HTML
-$article-publish 发布到微信公众号草稿箱
-```
-
-发布到微信草稿箱前，需要先填写配置文件：
-
-```text
-skills/article-publish/wechat_publish_config.json
-```
-
-配置中主要包含微信公众号的 `appid`、`secret`、作者信息、评论设置等。封面图会由流程自动生成并上传为微信永久素材，再把返回的 `media_id` 写入草稿创建请求。
-
----
-
-## 工作流程
-
-完整流程由 `article-wechat-auto` 统一调度，默认顺序如下：
-
-1. `article-search` 搜索和整理最新 AI 资讯，优先使用官方来源、RSS 和可信媒体。
-2. 从资讯列表中选择最适合写成公众号文章的主题。
-3. 在 `article/` 下创建本次文章目录，命名格式为 `YYYY-MM-DD_N`，例如 `2026-07-04_1`。
-4. `article-writing` 根据选题撰写 Markdown 文稿，并检查摘要长度、正文结构、语病、错别字和过度推断。
-5. `article-cover-image` 根据文章标题生成蓝色简约科技风封面，并规范化为 `900x383` 的 `cover.jpg`。
-6. `article-format` 把 Markdown 转换为一个微信后台可复制的 HTML 页面，正文不会重复渲染文章 H1 标题。
-7. 人工打开 HTML 页面，复制所见即所得内容到微信编辑器，或选择继续执行发布。
-8. `article-publish` 通过微信公众号 API 上传封面并创建草稿箱文章，等待人工审阅。
-
-每次生成内容都会放在独立文章目录中，避免多次运行互相覆盖。
-
----
-
-## 生成效果
-
-<img src="image/result.jpg" width="400" alt="生成效果预览">
-
----
-
 ## 目录结构
 
 ```text
@@ -117,7 +66,26 @@ skills/article-publish/wechat_publish_config.json
 
 ---
 
-## Python 环境
+## 工作流程
+
+完整流程由 `article-wechat-auto` 统一调度，默认顺序如下：
+
+1. `article-search` 搜索和整理最新 AI 资讯，优先使用官方来源、RSS 和可信媒体。
+2. 从资讯列表中选择最适合写成公众号文章的主题。
+3. 在 `article/` 下创建本次文章目录，命名格式为 `YYYY-MM-DD_N`，例如 `2026-07-04_1`。
+4. `article-writing` 根据选题撰写 Markdown 文稿，并检查摘要长度、正文结构、语病、错别字和过度推断。
+5. `article-cover-image` 根据文章标题生成蓝色简约科技风封面，并规范化为 `900x383` 的 `cover.jpg`。
+6. `article-format` 把 Markdown 转换为一个微信后台可复制的 HTML 页面，正文不会重复渲染文章 H1 标题。
+7. 人工打开 HTML 页面，复制所见即所得内容到微信编辑器，或选择继续执行发布。
+8. `article-publish` 通过微信公众号 API 上传封面并创建草稿箱文章，等待人工审阅。
+
+每次生成内容都会放在独立文章目录中，避免多次运行互相覆盖。
+
+---
+
+## 使用方式
+
+1、确认python环境：
 
 脚本以 Python 为主，建议安装：
 
@@ -127,6 +95,36 @@ python -m pip install pillow pyyaml
 ```
 
 其中 `pillow` 用于封面图裁切和压缩，`pyyaml` 用于 skill 文档校验。如果本机没有安装 `pillow`，封面规范化脚本会尝试使用系统中的 `ffmpeg` 或 Windows 图像能力作为降级方案。
+
+2、最简单的方式是直接调用主 skill：
+
+```text
+$article-wechat-auto 发布一篇最新的 AI 资讯
+```
+
+3、如果只想执行某一个环节，也可以单独调用子 skill：
+
+```text
+$article-search 搜索最新 AI 资讯
+$article-writing 把第一篇资讯整理成公众号 Markdown
+$article-cover-image 为这篇文章生成封面图
+$article-format 把 Markdown 转成微信可复制 HTML
+$article-publish 发布到微信公众号草稿箱
+```
+
+4、发布到微信草稿箱前，需要先填写配置文件：
+
+```text
+skills/article-publish/wechat_publish_config.json
+```
+
+配置中主要包含微信公众号的 `appid`、`secret`、作者信息、评论设置等。封面图会由流程自动生成并上传为微信永久素材，再把返回的 `media_id` 写入草稿创建请求。
+
+---
+
+## 生成效果
+
+<img src="image/result.jpg" width="400" alt="生成效果预览">
 
 ---
 
